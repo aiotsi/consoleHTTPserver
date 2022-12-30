@@ -24,11 +24,11 @@ namespace consoleHTTPserver
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
         public static HttpListener listener;
-        public static string port = "8000";
+        public static string port = "8008";
         public static string url = $"http://+:" + port + "/";
         public static int pageViews = 0;
         public static int requestCount = 0;
-       
+
         public static string pageData()
         {
             string page =
@@ -39,6 +39,9 @@ namespace consoleHTTPserver
             "    <title>DALINC</title>" +
             "  </head>" +
             "  <body style =\"text-align:center;\">" +
+            "   <a href=\"/fromStart\"> " +
+            "  <input type = \"button\" style =\"width:30px; height:30px; color:red;\" value=\"<\" />" +
+            "</a>" +
             "   <a href=\"/back\"> " +
             "  <input type = \"button\" style =\"width:80px; height:30px; color:red;\" value=\"<<<\" />" +
             "</a> " +
@@ -47,7 +50,10 @@ namespace consoleHTTPserver
             "</a> " +
             "   <a href=\"/forward\"> " +
             "  <input type = \"button\" style =\"width:80px; height:30px; color:red;\" value=\">>>\" />" +
-            "</a><br> " +
+            "</a> " +
+             "   <a href=\"/toEnd\"> " +
+            "  <input type = \"button\" style =\"width:30px; height:30px; color:red;\" value=\">\" />" +
+            "</a><br>" +
             "<a href=\"/info\"> " +
             "  <input type = \"button\" style =\"width:40px; height:30px; color:blue; margin-top:5px;  margin-bottom:5px;\" value=\"Info\" />" +
             "</a> " +
@@ -90,7 +96,7 @@ namespace consoleHTTPserver
 
             return page;
         }
-        
+
         public static async Task HandleIncomingConnections()
         {
             bool runServer = true;
@@ -127,55 +133,66 @@ namespace consoleHTTPserver
 
                     });
 
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/forward"))
-                {
-                    SendKeys.SendWait("{RIGHT}");
-                    Console.WriteLine("Forward");
-                }
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/back"))
-                {
-                    SendKeys.SendWait("{LEFT}");
-                    Console.WriteLine("Back");
-                }
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/volUp"))
-                {
-                    SendKeys.SendWait("{UP}");
-                    Console.WriteLine("Volume up");
-                }
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/volDown"))
-                {
-                    SendKeys.SendWait("{DOWN}");
-                    Console.WriteLine("Volue down");
-                }
-
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/pause"))
-                {
-                    SendKeys.SendWait(" ");
-                    Console.WriteLine("Pause");
-                }
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/mute"))
-                {
-                    SendKeys.SendWait("m");
-                    Console.WriteLine("mute");
-                }
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/info"))
-                {
-                    SendKeys.SendWait("i");
-                    Console.WriteLine("info");
-                }
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/close"))
-                {
-                    Console.WriteLine("close");
-                    Process[] processeFirefoxClose = Process.GetProcessesByName("firefox");
-
-                    Array.ForEach(processeFirefoxClose, (process) =>
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/forward"))
                     {
-                        Process pa = Process.GetProcessById(process.Id);
-                        pa.Kill();
-                        runServer = false;
+                        SendKeys.SendWait("{RIGHT}");
+                        Console.WriteLine("Forward");
+                    }
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/back"))
+                    {
+                        SendKeys.SendWait("{LEFT}");
+                        Console.WriteLine("Back");
+                    }
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/volUp"))
+                    {
+                        SendKeys.SendWait("{UP}");
+                        Console.WriteLine("Volume up");
+                    }
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/volDown"))
+                    {
+                        SendKeys.SendWait("{DOWN}");
+                        Console.WriteLine("Volue down");
+                    }
 
-                    });
-                }
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/pause"))
+                    {
+                        SendKeys.SendWait(" ");
+                        Console.WriteLine("Pause");
+                    }
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/mute"))
+                    {
+                        SendKeys.SendWait("m");
+                        Console.WriteLine("mute");
+                    }
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/info"))
+                    {
+                        SendKeys.SendWait("i");
+                        Console.WriteLine("info");
+                    }
+
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/fromStart"))
+                    {
+                        SendKeys.SendWait("{HOME}");
+                        Console.WriteLine("Play from start");
+                    }
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/toEnd"))
+                    {
+                        SendKeys.SendWait("{END}");
+                        Console.WriteLine("Go to end");
+                    }
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/close"))
+                    {
+                        Console.WriteLine("close");
+                        Process[] processeFirefoxClose = Process.GetProcessesByName("firefox");
+
+                        Array.ForEach(processeFirefoxClose, (process) =>
+                        {
+                            Process pa = Process.GetProcessById(process.Id);
+                            pa.Kill();
+                            runServer = false;
+
+                        });
+                    }
 
                     string pthStr = AppDomain.CurrentDomain.BaseDirectory + "/tv.csv";
                     List<string[]> rows = File.ReadAllLines(pthStr).Select(x => x.Split(',')).ToList();
@@ -200,21 +217,21 @@ namespace consoleHTTPserver
                         }
 
                     }
-                
-                // Make sure we don't increment the page views counter if `favicon.ico` is requested
-                if (req.Url.AbsolutePath != "/favicon.ico")
-                    pageViews += 1;
 
-                // Write the response info
-                string disableSubmit = !runServer ? "disabled" : "";
-                byte[] data = Encoding.UTF8.GetBytes(String.Format(pageData(), pageViews, disableSubmit));
-                resp.ContentType = "text/html";
-                resp.ContentEncoding = Encoding.UTF8;
-                resp.ContentLength64 = data.LongLength;
+                    // Make sure we don't increment the page views counter if `favicon.ico` is requested
+                    if (req.Url.AbsolutePath != "/favicon.ico")
+                        pageViews += 1;
 
-                // Write out to the response stream (asynchronously), then close it
-                await resp.OutputStream.WriteAsync(data, 0, data.Length);
-                resp.Close();
+                    // Write the response info
+                    string disableSubmit = !runServer ? "disabled" : "";
+                    byte[] data = Encoding.UTF8.GetBytes(String.Format(pageData(), pageViews, disableSubmit));
+                    resp.ContentType = "text/html";
+                    resp.ContentEncoding = Encoding.UTF8;
+                    resp.ContentLength64 = data.LongLength;
+
+                    // Write out to the response stream (asynchronously), then close it
+                    await resp.OutputStream.WriteAsync(data, 0, data.Length);
+                    resp.Close();
                 }
                 catch (Exception ex)
                 {
@@ -225,7 +242,7 @@ namespace consoleHTTPserver
                 Console.WriteLine();
             }
         }
-        
+
         public static void runBrowser()
         {
             Uri url = new Uri("https://eon.tv/");
@@ -239,7 +256,7 @@ namespace consoleHTTPserver
             Thread.Sleep(3000);
             SendKeys.SendWait("^(t)");
         }
-        
+
         public static void Main(string[] args)
         {
             runBrowser();
@@ -271,8 +288,8 @@ namespace consoleHTTPserver
 
                 Console.WriteLine("Error");
             }
-            
-            
+
+
         }
     }
 }
