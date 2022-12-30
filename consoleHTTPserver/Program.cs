@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Net;
@@ -67,10 +67,8 @@ namespace consoleHTTPserver
 
             try
             {
-                //MessageBox.Show(rows.Count.ToString());
                 foreach (var item in rows)
                 {
-                    //Console.WriteLine(item[1]);
                     page += " <a href =\"/" + item[1] + "\"> " +
                 "  <input type = \"button\" style =\"width:80px; height:30px; color:blue; margin:5px 5px;\" value=\"" + item[1] + "\" />" +
                 "</a>";
@@ -117,12 +115,9 @@ namespace consoleHTTPserver
                 try
                 {
                     Process[] processes = Process.GetProcessesByName("firefox");
-                    Debug.WriteLine("{0} Firefox processes", processes.Length);
 
                     Array.ForEach(processes, (process) =>
                     {
-                        Debug.WriteLine("Process: {0} Id: {1}",
-                            process.ProcessName, process.Id);
                         Process pa = Process.GetProcessById(process.Id);
                         if (pa != null)
                         {
@@ -145,12 +140,12 @@ namespace consoleHTTPserver
                 if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/volUp"))
                 {
                     SendKeys.SendWait("{UP}");
-                    Console.WriteLine("Forward");
+                    Console.WriteLine("Volume up");
                 }
                 if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/volDown"))
                 {
                     SendKeys.SendWait("{DOWN}");
-                    Console.WriteLine("Back");
+                    Console.WriteLine("Volue down");
                 }
 
                 if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/pause"))
@@ -172,7 +167,6 @@ namespace consoleHTTPserver
                 {
                     Console.WriteLine("close");
                     Process[] processeFirefoxClose = Process.GetProcessesByName("firefox");
-                    Debug.WriteLine("{0} Firefox processes", processeFirefoxClose.Length);
 
                     Array.ForEach(processeFirefoxClose, (process) =>
                     {
@@ -192,7 +186,7 @@ namespace consoleHTTPserver
                         if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/" + item[1]))
                         {
                             SendKeys.SendWait("^w");
-                            Console.WriteLine(item[1]);
+                            Console.WriteLine("Channel: " + item[1]);
                             Uri url = new Uri("https://eon.tv/player/" + item[0]);
                             Process.Start(new ProcessStartInfo
                             {
